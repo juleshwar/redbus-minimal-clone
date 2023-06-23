@@ -17,6 +17,7 @@ export interface Suggestion {
 const InputWithAutosuggestion = (props: Props) => {
   const { label, value, onChangeText: onChangeText, suggestions } = props;
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isInputInFocus, setIsInputInFocus] = useState(false);
 
   const onClickSuggestionHandler = (item: SuggestionItem) => {
     onChangeText(item.name);
@@ -37,11 +38,26 @@ const InputWithAutosuggestion = (props: Props) => {
   return (
     <>
       <div className="flex relative" onBlur={onBlurHandler}>
-        <div className="flex">
-          <label className="">
+        <div className="relative">
+          <label
+            className={classNames([
+              "absolute left-0",
+              "pointer-events-none",
+              "transition-all",
+              value.length || isInputInFocus
+                ? "text-gray-500 bottom-full text-sm"
+                : "bottom-0",
+            ])}
+          >
             <span>{label}</span>
           </label>
-          <input type="text" value={value} onChange={onChangeTextHandler} />
+          <input
+            type="text"
+            value={value}
+            onChange={onChangeTextHandler}
+            onBlur={() => setIsInputInFocus(false)}
+            onFocus={() => setIsInputInFocus(true)}
+          />
         </div>
         <div
           className={classNames([
