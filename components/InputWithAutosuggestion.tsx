@@ -30,15 +30,8 @@ const InputWithAutosuggestion = (props: Props) => {
     setShowSuggestions(true);
   };
 
-  const onBlurHandler = (event: FocusEvent) => {
-    console.log(
-      "event.relatedTarget",
-      event.currentTarget,
-      event.relatedTarget
-    );
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      setShowSuggestions(false);
-    }
+  const onBlurHandler = () => {
+    setShowSuggestions(false);
   };
 
   return (
