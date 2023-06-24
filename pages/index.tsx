@@ -144,7 +144,6 @@ export default function Home() {
           </form>
         </div>
       </section>
-      <section>{travelDate.toString()}</section>
     </main>
   );
 }
