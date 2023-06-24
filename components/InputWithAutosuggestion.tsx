@@ -7,6 +7,7 @@ interface Props {
   value: string;
   onChangeText: (newText: string) => void;
   suggestions: Suggestion[];
+  isRequired?: boolean;
 }
 
 export interface Suggestion {
@@ -15,7 +16,13 @@ export interface Suggestion {
 }
 
 const InputWithAutosuggestion = (props: Props) => {
-  const { label, value, onChangeText: onChangeText, suggestions } = props;
+  const {
+    label,
+    value,
+    onChangeText: onChangeText,
+    suggestions,
+    isRequired = false,
+  } = props;
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isInputInFocus, setIsInputInFocus] = useState(false);
 
@@ -57,6 +64,7 @@ const InputWithAutosuggestion = (props: Props) => {
             onChange={onChangeTextHandler}
             onBlur={() => setIsInputInFocus(false)}
             onFocus={() => setIsInputInFocus(true)}
+            required={isRequired}
           />
         </div>
         <div
