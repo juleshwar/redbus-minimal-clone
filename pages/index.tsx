@@ -3,9 +3,11 @@ import {
   InputWithAutosuggestion,
   Suggestion,
 } from "@/components/InputWithAutosuggestion";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { FormEvent, RefObject, useEffect, useRef, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
+import { BusTicketsPageSearchParams } from "./bus-tickets";
 
 const getLocationSuggestions = (loc: string): Suggestion[] => {
   const locations = [
@@ -46,8 +48,11 @@ const getLocationSuggestions = (loc: string): Suggestion[] => {
 };
 
 export default function Home() {
+  const router = useRouter();
   const [sourceLocation, setSourceLocation] = useState("Madurai");
   const [destinationLocation, setDestinationLocation] = useState("Chennai");
+  const [travelDate, setTravelDate] = useState(dayjs());
+
   const [locationSuggestions, setLocationSuggestions] = useState(
     [] as Suggestion[]
   );
@@ -61,10 +66,24 @@ export default function Home() {
     setDestinationLocation(newLocation);
     setLocationSuggestions([]);
   };
+  const getBusTicketsUrl = () => {
+    const queryParams: BusTicketsPageSearchParams = {
+      from: sourceLocation,
+      to: destinationLocation,
+      date: travelDate.date().toString(),
+      month: travelDate.month().toString(),
+      year: travelDate.year().toString(),
+    };
+    return {
+      pathname: "/bus-tickets",
+      query: queryParams,
+    };
+  };
 
-  const onFormSubmitHandler = () => {
+  const onFormSubmitHandler = (e: FormEvent) => {
+    e.preventDefault();
     if (travelFormRef.current?.checkValidity()) {
-      console.log("Route to bus-tickets page");
+      router.push(getBusTicketsUrl());
     }
   };
 
@@ -111,8 +130,11 @@ export default function Home() {
             |
             <div>
               <DatePicker
-                minDate={dayjs()}
-                defaultValue={dayjs()}
+                minDate={travelDate}
+                defaultValue={travelDate}
+                onChange={(value) =>
+                  value ? setTravelDate(value) : setTravelDate(dayjs())
+                }
                 format="DD MMM YYYY"
               />
             </div>
@@ -122,6 +144,7 @@ export default function Home() {
           </form>
         </div>
       </section>
+      <section>{travelDate.toString()}</section>
     </main>
   );
 }
