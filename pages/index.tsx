@@ -3,7 +3,7 @@ import {
   InputWithAutosuggestion,
   Suggestion,
 } from "@/components/InputWithAutosuggestion";
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
@@ -51,6 +51,8 @@ export default function Home() {
   const [locationSuggestions, setLocationSuggestions] = useState(
     [] as Suggestion[]
   );
+  const travelFormRef = useRef(null) as RefObject<HTMLFormElement>;
+
   const onFromLocationChange = (newLocation: string) => {
     setSourceLocation(newLocation);
     setLocationSuggestions([]);
@@ -58,6 +60,12 @@ export default function Home() {
   const onDestinationLocationChange = (newLocation: string) => {
     setDestinationLocation(newLocation);
     setLocationSuggestions([]);
+  };
+
+  const onFormSubmitHandler = () => {
+    if (travelFormRef.current?.checkValidity()) {
+      console.log("Route to bus-tickets page");
+    }
   };
 
   useEffect(() => {
@@ -76,13 +84,18 @@ export default function Home() {
           className="flex w-full items-center justify-center bg-cover bg-no-repeat h-96"
           style={{ backgroundImage: "url('/home-bg-banner.svg')" }}
         >
-          <form className="flex bg-white text-xl rounded-3xl shadow-md gap-8 items-center h-24 w-fit">
+          <form
+            className="flex bg-white text-xl rounded-3xl shadow-md gap-8 items-center h-24 w-fit"
+            onSubmit={onFormSubmitHandler}
+            ref={travelFormRef}
+          >
             <div className="pl-9">
               <InputWithAutosuggestion
                 label="From"
                 value={sourceLocation}
                 onChangeText={onFromLocationChange}
                 suggestions={locationSuggestions}
+                isRequired={true}
               />
             </div>
             |
@@ -92,11 +105,16 @@ export default function Home() {
                 value={destinationLocation}
                 onChangeText={onDestinationLocationChange}
                 suggestions={locationSuggestions}
+                isRequired={true}
               />
             </div>
             |
             <div>
-              <DatePicker className="border-none" minDate={dayjs()} />
+              <DatePicker
+                minDate={dayjs()}
+                defaultValue={dayjs()}
+                format="DD MMM YYYY"
+              />
             </div>
             <button className="h-full px-9 font-semibold overflow-hidden rounded-r-3xl text-white bg-green-700">
               SEARCH BUSES
