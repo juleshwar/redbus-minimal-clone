@@ -8,10 +8,20 @@ interface Props {
 	onChangeText: (newText: string) => void;
 	suggestions: SuggestionItem[];
 	isRequired?: boolean;
+	isError?: boolean;
+	errorMessage?: string;
 }
 
 const InputWithAutosuggestion = (props: Props) => {
-	const { label, value, onChangeText: onChangeText, suggestions, isRequired = false } = props;
+	const {
+		label,
+		value,
+		onChangeText: onChangeText,
+		suggestions,
+		isRequired = false,
+		isError = false,
+		errorMessage,
+	} = props;
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const [isInputInFocus, setIsInputInFocus] = useState(false);
 
@@ -52,7 +62,11 @@ const InputWithAutosuggestion = (props: Props) => {
 						onBlur={() => setIsInputInFocus(false)}
 						onFocus={() => setIsInputInFocus(true)}
 						required={isRequired}
+						className={classNames([isError && "border border-red-600"])}
 					/>
+					{isError && errorMessage && (
+						<span className="absolute top-full left-0 text-xs text-red-600">{errorMessage}</span>
+					)}
 				</div>
 				<div className={classNames(["border border-blue-600", "absolute top-full", !showSuggestions && "hidden"])}>
 					<SuggestionDropdown items={suggestions} onClickItem={onClickSuggestionHandler} />
