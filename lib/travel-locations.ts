@@ -47,7 +47,14 @@ export function getAllLocationIdToNameMap() {
 	return getAllLocationIds().reduce((acc, locId) => {
 		acc[locId] = LOCATION_DETAILS[locId].name;
 		return acc;
-	}, {} as Record<LOCATION_ID, string>);
+	}, {} as Record<LOCATION_ID, LocationDetails["name"]>);
+}
+
+export function getAllNameToLocationIdMap() {
+	return getAllLocationIds().reduce((acc, locId) => {
+		acc[LOCATION_DETAILS[locId].name] = locId;
+		return acc;
+	}, {} as Record<LocationDetails["name"], LOCATION_ID>);
 }
 
 export function getAllTravelLocationsWithDetails() {
