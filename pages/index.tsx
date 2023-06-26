@@ -14,28 +14,28 @@ import {
 import { SuggestionItem } from "@/components/SuggestionDropdown";
 
 export async function getServerSideProps() {
-	const allLocationsToNameMap = getAllLocationIdToNameMap();
-	const allNameToLocationsMap = getAllNameToLocationIdMap();
+	const allLocationIdToNameMap = getAllLocationIdToNameMap();
+	const allNameToLocationIdMap = getAllNameToLocationIdMap();
 
 	return {
 		props: {
-			allLocationsToNameMap,
-			allNameToLocationsMap,
+			allLocationIdToNameMap,
+			allNameToLocationIdMap,
 		},
 	};
 }
 
 interface Props {
-	allLocationsToNameMap: Record<LOCATION_ID, LocationDetails["name"]>;
-	allNameToLocationsMap: Record<LocationDetails["name"], LOCATION_ID>;
+	allLocationIdToNameMap: Record<LOCATION_ID, LocationDetails["name"]>;
+	allNameToLocationIdMap: Record<LocationDetails["name"], LOCATION_ID>;
 }
 
-export default function Home({ allLocationsToNameMap, allNameToLocationsMap }: Props) {
+export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }: Props) {
 	const router = useRouter();
-	const [sourceLocation, setSourceLocation] = useState(allLocationsToNameMap[LOCATION_ID.MADURAI]);
+	const [sourceLocation, setSourceLocation] = useState(allLocationIdToNameMap[LOCATION_ID.MADURAI]);
 	const [sourceLocationErrorMessage, setSourceLocationErrorMessage] = useState("");
 	const [destinationLocation, setDestinationLocation] = useState(
-		allLocationsToNameMap[LOCATION_ID.CHENNAI]
+		allLocationIdToNameMap[LOCATION_ID.CHENNAI]
 	);
 	const [destinationLocationErrorMessage, setDestinationLocationErrorMessage] = useState("");
 	const [travelDate, setTravelDate] = useState(dayjs());
@@ -53,13 +53,13 @@ export default function Home({ allLocationsToNameMap, allNameToLocationsMap }: P
 	};
 
 	const isFormValid = () => {
-		const isSourceLocationValid = allNameToLocationsMap[sourceLocation] !== undefined;
+		const isSourceLocationValid = allNameToLocationIdMap[sourceLocation] !== undefined;
 		if (!isSourceLocationValid) {
 			setSourceLocationErrorMessage("Please select a location from the dropdown");
 			return false;
 		}
 
-		const isDestinationLocationValid = allNameToLocationsMap[destinationLocation] !== undefined;
+		const isDestinationLocationValid = allNameToLocationIdMap[destinationLocation] !== undefined;
 		if (!isDestinationLocationValid) {
 			setDestinationLocationErrorMessage("Please select a location from the dropdown");
 			return false;
@@ -73,9 +73,10 @@ export default function Home({ allLocationsToNameMap, allNameToLocationsMap }: P
 		if (isFormValid()) {
 			router.push(
 				getBusTicketsUrl(
-					allNameToLocationsMap[sourceLocation],
-					allNameToLocationsMap[destinationLocation],
-					travelDate
+					allNameToLocationIdMap[sourceLocation],
+					allNameToLocationIdMap[destinationLocation],
+					travelDate,
+					allNameToLocationIdMap
 				)
 			);
 		}
@@ -84,16 +85,16 @@ export default function Home({ allLocationsToNameMap, allNameToLocationsMap }: P
 	// TODO: Add debouncing to filter locations
 	useEffect(() => {
 		setLocationSuggestions(
-			getLocationSuggestions(sourceLocation, allLocationsToNameMap) as SuggestionItem[]
+			getLocationSuggestions(sourceLocation, allLocationIdToNameMap) as SuggestionItem[]
 		);
-	}, [sourceLocation, allLocationsToNameMap]);
+	}, [sourceLocation, allLocationIdToNameMap]);
 
 	// TODO: Add debouncing to filter locations
 	useEffect(() => {
 		setLocationSuggestions(
-			getLocationSuggestions(destinationLocation, allLocationsToNameMap) as SuggestionItem[]
+			getLocationSuggestions(destinationLocation, allLocationIdToNameMap) as SuggestionItem[]
 		);
-	}, [destinationLocation, allLocationsToNameMap]);
+	}, [destinationLocation, allLocationIdToNameMap]);
 
 	return (
 		<main className="flex min-h-screen flex-col">
@@ -152,9 +153,9 @@ export default function Home({ allLocationsToNameMap, allNameToLocationsMap }: P
 
 const getLocationSuggestions = (
 	loc: string,
-	allLocationsToNameMap: Record<LOCATION_ID, LocationDetails["name"]>
+	allLocationIdToNameMap: Record<LOCATION_ID, LocationDetails["name"]>
 ): SuggestionItem[] => {
-	const allLocationSuggestions = Object.entries(allLocationsToNameMap).map(([locId, locName]) => ({
+	const allLocationSuggestions = Object.entries(allLocationIdToNameMap).map(([locId, locName]) => ({
 		id: locId,
 		name: locName,
 	}));
@@ -169,11 +170,12 @@ const getLocationSuggestions = (
 function getBusTicketsUrl(
 	sourceLocation: LOCATION_ID,
 	destinationLocation: LOCATION_ID,
-	travelDate: dayjs.Dayjs
+	travelDate: dayjs.Dayjs,
+	allNameToLocationIdMap: Record<LocationDetails["name"], LOCATION_ID>
 ) {
 	const queryParams: BusTicketsPageSearchParams = {
-		from: sourceLocation,
-		to: destinationLocation,
+		from: allNameToLocationIdMap[sourceLocation],
+		to: allNameToLocationIdMap[destinationLocation],
 		date: travelDate.date().toString(),
 		month: travelDate.month().toString(),
 		year: travelDate.year().toString(),
