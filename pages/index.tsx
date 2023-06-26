@@ -75,8 +75,7 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 				getBusTicketsUrl(
 					allNameToLocationIdMap[sourceLocation],
 					allNameToLocationIdMap[destinationLocation],
-					travelDate,
-					allNameToLocationIdMap
+					travelDate
 				)
 			);
 		}
@@ -168,14 +167,13 @@ const getLocationSuggestions = (
 };
 
 function getBusTicketsUrl(
-	sourceLocation: LOCATION_ID,
-	destinationLocation: LOCATION_ID,
-	travelDate: dayjs.Dayjs,
-	allNameToLocationIdMap: Record<LocationDetails["name"], LOCATION_ID>
+	sourceLocationId: LOCATION_ID,
+	destinationLocationId: LOCATION_ID,
+	travelDate: dayjs.Dayjs
 ) {
 	const queryParams: BusTicketsPageSearchParams = {
-		from: allNameToLocationIdMap[sourceLocation],
-		to: allNameToLocationIdMap[destinationLocation],
+		from: sourceLocationId,
+		to: destinationLocationId,
 		date: travelDate.date().toString(),
 		month: travelDate.month().toString(),
 		year: travelDate.year().toString(),
