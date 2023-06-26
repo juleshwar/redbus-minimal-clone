@@ -43,7 +43,7 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 	const [locationSuggestions, setLocationSuggestions] = useState([] as SuggestionItem[]);
 	const travelFormRef = useRef(null) as RefObject<HTMLFormElement>;
 
-	const onFromLocationChange = (newLocation: string) => {
+	const onSourceLocationChange = (newLocation: string) => {
 		setSourceLocation(newLocation);
 		setLocationSuggestions([]);
 	};
@@ -113,7 +113,7 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 							<InputWithAutosuggestion
 								label="From"
 								value={sourceLocation}
-								onChangeText={onFromLocationChange}
+								onChangeText={onSourceLocationChange}
 								suggestions={locationSuggestions}
 								isRequired={true}
 								isError={sourceLocationErrorMessage.length > 0}
