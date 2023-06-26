@@ -3,85 +3,63 @@ import { ChangeEvent, FocusEvent, useState } from "react";
 import { SuggestionDropdown, SuggestionItem } from "./SuggestionDropdown";
 
 interface Props {
-  label?: string;
-  value: string;
-  onChangeText: (newText: string) => void;
-  suggestions: Suggestion[];
-  isRequired?: boolean;
-}
-
-export interface Suggestion {
-  id: number;
-  name: string;
+	label?: string;
+	value: string;
+	onChangeText: (newText: string) => void;
+	suggestions: SuggestionItem[];
+	isRequired?: boolean;
 }
 
 const InputWithAutosuggestion = (props: Props) => {
-  const {
-    label,
-    value,
-    onChangeText: onChangeText,
-    suggestions,
-    isRequired = false,
-  } = props;
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isInputInFocus, setIsInputInFocus] = useState(false);
+	const { label, value, onChangeText: onChangeText, suggestions, isRequired = false } = props;
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [isInputInFocus, setIsInputInFocus] = useState(false);
 
-  const onClickSuggestionHandler = (item: SuggestionItem) => {
-    onChangeText(item.name);
-    setShowSuggestions(false);
-  };
+	// Check if the current text is valid. i.e if the text exists in the Suggestions
 
-  const onChangeTextHandler = ({
-    currentTarget,
-  }: ChangeEvent<HTMLInputElement>) => {
-    onChangeText(currentTarget.value);
-    setShowSuggestions(true);
-  };
+	const onClickSuggestionHandler = (item: SuggestionItem) => {
+		onChangeText(item.name);
+		setShowSuggestions(false);
+	};
 
-  const onBlurHandler = () => {
-    setShowSuggestions(false);
-  };
+	const onChangeTextHandler = ({ currentTarget }: ChangeEvent<HTMLInputElement>) => {
+		onChangeText(currentTarget.value);
+		setShowSuggestions(true);
+	};
 
-  return (
-    <>
-      <div className="flex relative" onBlur={onBlurHandler}>
-        <div className="relative">
-          <label
-            className={classNames([
-              "absolute left-0",
-              "pointer-events-none",
-              "transition-all",
-              value.length || isInputInFocus
-                ? "text-gray-500 bottom-full text-sm"
-                : "bottom-0",
-            ])}
-          >
-            <span>{label}</span>
-          </label>
-          <input
-            type="text"
-            value={value}
-            onChange={onChangeTextHandler}
-            onBlur={() => setIsInputInFocus(false)}
-            onFocus={() => setIsInputInFocus(true)}
-            required={isRequired}
-          />
-        </div>
-        <div
-          className={classNames([
-            "border border-blue-600",
-            "absolute top-full",
-            !showSuggestions && "hidden",
-          ])}
-        >
-          <SuggestionDropdown
-            items={suggestions}
-            onClickItem={onClickSuggestionHandler}
-          />
-        </div>
-      </div>
-    </>
-  );
+	const onBlurHandler = () => {
+		setShowSuggestions(false);
+	};
+
+	return (
+		<>
+			<div className="flex relative" onBlur={onBlurHandler}>
+				<div className="relative">
+					<label
+						className={classNames([
+							"absolute left-0",
+							"pointer-events-none",
+							"transition-all",
+							value.length || isInputInFocus ? "text-gray-500 bottom-full text-sm" : "bottom-0",
+						])}
+					>
+						<span>{label}</span>
+					</label>
+					<input
+						type="text"
+						value={value}
+						onChange={onChangeTextHandler}
+						onBlur={() => setIsInputInFocus(false)}
+						onFocus={() => setIsInputInFocus(true)}
+						required={isRequired}
+					/>
+				</div>
+				<div className={classNames(["border border-blue-600", "absolute top-full", !showSuggestions && "hidden"])}>
+					<SuggestionDropdown items={suggestions} onClickItem={onClickSuggestionHandler} />
+				</div>
+			</div>
+		</>
+	);
 };
 
 export { InputWithAutosuggestion };
