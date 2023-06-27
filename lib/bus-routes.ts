@@ -19,10 +19,13 @@ export interface BusRoute {
 	to: LOCATION_ID;
 	startTime: string;
 	endTime: string;
+	travelDurationInHours: number;
 	id: string;
 }
 
 const getDateStringPlus10Hours = (d: string) => dayjs(d).add(10, "hours").toString();
+const getDateDiffInHours = (a: string, b: string) =>
+	Math.abs(dayjs(a).diff(dayjs(b), "hours", true));
 const generateUniqueBusId = () => uniqueId("bus_");
 
 const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => {
@@ -37,6 +40,7 @@ const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.CHENNAI,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
 					id: generateUniqueBusId(),
 				},
 			],
@@ -49,6 +53,7 @@ const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.HYDERABAD,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
 					id: generateUniqueBusId(),
 				},
 			],
@@ -61,6 +66,7 @@ const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.COIMBATORE,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
 					id: generateUniqueBusId(),
 				},
 			],
@@ -79,6 +85,7 @@ const getChennaiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.BANGALORE,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
 					id: generateUniqueBusId(),
 				},
 			],
@@ -91,6 +98,7 @@ const getChennaiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.HYDERABAD,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
 					id: generateUniqueBusId(),
 				},
 			],
@@ -103,6 +111,7 @@ const getChennaiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => 
 					to: LOCATION_ID.COIMBATORE,
 					startTime: date,
 					endTime: datePlus10Hours,
+					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
 					id: generateUniqueBusId(),
 				},
 			],
