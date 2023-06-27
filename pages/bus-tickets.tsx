@@ -4,6 +4,8 @@ import { BusRoute, getBusRoutes } from "../lib/bus-routes";
 import dayjs from "dayjs";
 import { LOCATION_ID } from "../lib/travel-locations";
 import { GetServerSidePropsContext } from "next";
+import { Header } from "../components/Header";
+import BusesListing from "../components/BusesListing";
 
 export interface BusTicketsPageSearchParams extends ParsedUrlQuery {
 	to: LOCATION_ID;
@@ -15,7 +17,11 @@ export interface BusTicketsPageSearchParams extends ParsedUrlQuery {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const { to, from, date, month, year } = context.query as BusTicketsPageSearchParams;
-	const busesInRoute = await getBusRoutes(from, to, dayjs(`${year}/${month}/${date}`).toString());
+	const busesInRoute = await getBusRoutes(
+		from,
+		to,
+		dayjs(`${year}/${month}/${date}`).local().format()
+	);
 	return { props: { busesInRoute } };
 }
 
@@ -31,12 +37,15 @@ export default function BusTickets({ busesInRoute }: Props) {
 
 	return (
 		<>
-			<div>
-				Bus tickets from {from} to {to} on {date + "/" + month + "/" + year}
+			<div className="flex min-h-screen flex-col">
+				<Header />
+				<main className="flex grow h-full">
+					<aside className="w-64 border border-r-black">Filters</aside>
+					<div className="scroll grow">
+						<BusesListing busesList={busesInRoute} />
+					</div>
+				</main>
 			</div>
-			{busesInRoute.map((bus) => {
-				return <li key={bus.from}>{bus.startTime.toString() + " => " + bus.endTime.toString()}</li>;
-			})}
 		</>
 	);
 }
