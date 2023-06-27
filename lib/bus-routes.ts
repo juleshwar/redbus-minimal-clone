@@ -1,97 +1,132 @@
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { LOCATION_ID } from "./travel-locations";
+import { uniqueId } from "lodash";
 
-export async function getBusRoutes(from: LOCATION_ID, to: LOCATION_ID, date: Dayjs) {
-	return ALL_ROUTES.get(from)
-		?.get(to)
-		?.filter((route) => {
-			route.startTime.isSame(date);
-		});
+export async function getBusRoutes(
+	from: LOCATION_ID,
+	to: LOCATION_ID,
+	date: string
+): Promise<BusRoute[]> {
+	return (
+		ALL_ROUTES.get(from)
+			?.get(to)
+			?.filter((route) => dayjs(route.startTime).isAfter(dayjs(date))) ?? []
+	);
 }
 
-const NOW = dayjs();
-const NOW_PLUS_10_HOURS = dayjs().add(10, "hours");
-
-interface BusRoute {
+export interface BusRoute {
 	from: LOCATION_ID;
 	to: LOCATION_ID;
-	startTime: Dayjs;
-	endTime: Dayjs;
+	startTime: string;
+	endTime: string;
+	id: string;
 }
 
-const MADURAI_ROUTES = new Map<LOCATION_ID, BusRoute[]>([
-	[
-		LOCATION_ID.CHENNAI,
-		[
-			{
-				from: LOCATION_ID.MADURAI,
-				to: LOCATION_ID.CHENNAI,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
-		],
-	],
-	[
-		LOCATION_ID.HYDERABAD,
-		[
-			{
-				from: LOCATION_ID.MADURAI,
-				to: LOCATION_ID.HYDERABAD,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
-		],
-	],
-	[
-		LOCATION_ID.COIMBATORE,
-		[
-			{
-				from: LOCATION_ID.MADURAI,
-				to: LOCATION_ID.COIMBATORE,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
-		],
-	],
-]);
+const getDateStringPlus10Hours = (d: string) => dayjs(d).add(10, "hours").toString();
+const generateUniqueBusId = () => uniqueId("bus_");
 
-const CHENNAI_ROUTES = new Map<LOCATION_ID, BusRoute[]>([
-	[
-		LOCATION_ID.BANGALORE,
+const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => {
+	const datePlus10Hours = getDateStringPlus10Hours(date);
+
+	return new Map<LOCATION_ID, BusRoute[]>([
 		[
-			{
-				from: LOCATION_ID.CHENNAI,
-				to: LOCATION_ID.BANGALORE,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
+			LOCATION_ID.CHENNAI,
+			[
+				{
+					from: LOCATION_ID.MADURAI,
+					to: LOCATION_ID.CHENNAI,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
 		],
-	],
-	[
-		LOCATION_ID.HYDERABAD,
 		[
-			{
-				from: LOCATION_ID.CHENNAI,
-				to: LOCATION_ID.HYDERABAD,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
+			LOCATION_ID.HYDERABAD,
+			[
+				{
+					from: LOCATION_ID.MADURAI,
+					to: LOCATION_ID.HYDERABAD,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
 		],
-	],
-	[
-		LOCATION_ID.COIMBATORE,
 		[
-			{
-				from: LOCATION_ID.CHENNAI,
-				to: LOCATION_ID.COIMBATORE,
-				startTime: NOW,
-				endTime: NOW_PLUS_10_HOURS,
-			},
+			LOCATION_ID.COIMBATORE,
+			[
+				{
+					from: LOCATION_ID.MADURAI,
+					to: LOCATION_ID.COIMBATORE,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
 		],
-	],
-]);
+	]);
+};
+
+const getChennaiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => {
+	const datePlus10Hours = getDateStringPlus10Hours(date);
+	return new Map([
+		[
+			LOCATION_ID.BANGALORE,
+			[
+				{
+					from: LOCATION_ID.CHENNAI,
+					to: LOCATION_ID.BANGALORE,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
+		],
+		[
+			LOCATION_ID.HYDERABAD,
+			[
+				{
+					from: LOCATION_ID.CHENNAI,
+					to: LOCATION_ID.HYDERABAD,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
+		],
+		[
+			LOCATION_ID.COIMBATORE,
+			[
+				{
+					from: LOCATION_ID.CHENNAI,
+					to: LOCATION_ID.COIMBATORE,
+					startTime: date,
+					endTime: datePlus10Hours,
+					id: generateUniqueBusId(),
+				},
+			],
+		],
+	]);
+};
 
 const ALL_ROUTES = new Map([
-	[LOCATION_ID.MADURAI, MADURAI_ROUTES],
-	[LOCATION_ID.CHENNAI, CHENNAI_ROUTES],
+	[
+		LOCATION_ID.MADURAI,
+		new Map( // Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
+			(function* () {
+				yield* getMaduraiRoutesForDate("2023/06/27 10:00:00 +5:30");
+				yield* getMaduraiRoutesForDate("2023/06/28 10:00:00 +5:30");
+			})()
+		),
+	],
+	[
+		LOCATION_ID.CHENNAI,
+		new Map( // Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
+			(function* () {
+				yield* getChennaiRoutesForDate("2023/06/27 10:00:00 +5:30");
+				yield* getChennaiRoutesForDate("2023/06/28 10:00:00 +5:30");
+			})()
+		),
+	],
 ]);
