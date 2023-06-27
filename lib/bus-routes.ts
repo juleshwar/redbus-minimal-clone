@@ -1,18 +1,11 @@
 import dayjs from "dayjs";
 import { LOCATION_ID } from "./travel-locations";
-import { uniqueId } from "lodash";
+import { uniqueId, random } from "lodash";
+import utc from "dayjs/plugin/utc";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
 
-export async function getBusRoutes(
-	from: LOCATION_ID,
-	to: LOCATION_ID,
-	date: string
-): Promise<BusRoute[]> {
-	return (
-		ALL_ROUTES.get(from)
-			?.get(to)
-			?.filter((route) => dayjs(route.startTime).isAfter(dayjs(date))) ?? []
-	);
-}
+dayjs.extend(utc);
+dayjs.extend(LocalizedFormat);
 
 export interface BusRoute {
 	from: LOCATION_ID;
@@ -23,119 +16,82 @@ export interface BusRoute {
 	id: string;
 }
 
-const getDateStringPlus10Hours = (d: string) => dayjs(d).add(10, "hours").toString();
-const getDateDiffInHours = (a: string, b: string) =>
-	Math.abs(dayjs(a).diff(dayjs(b), "hours", true));
-const generateUniqueBusId = () => uniqueId("bus_");
+const BUS_TIME_FORMAT = "llll";
 
-const getMaduraiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => {
-	const datePlus10Hours = getDateStringPlus10Hours(date);
+export async function getBusRoutes(
+	from: LOCATION_ID,
+	to: LOCATION_ID,
+	date: string
+): Promise<BusRoute[]> {
+	return (
+		ALL_ROUTES.get(from)
+			?.get(to)
+			?.filter((route) => {
+				return dayjs(route.startTime).isAfter(dayjs(date));
+			}) ?? []
+	);
+}
 
-	return new Map<LOCATION_ID, BusRoute[]>([
-		[
-			LOCATION_ID.CHENNAI,
-			[
-				{
-					from: LOCATION_ID.MADURAI,
-					to: LOCATION_ID.CHENNAI,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-		[
-			LOCATION_ID.HYDERABAD,
-			[
-				{
-					from: LOCATION_ID.MADURAI,
-					to: LOCATION_ID.HYDERABAD,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-		[
-			LOCATION_ID.COIMBATORE,
-			[
-				{
-					from: LOCATION_ID.MADURAI,
-					to: LOCATION_ID.COIMBATORE,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: getDateDiffInHours(datePlus10Hours, date),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-	]);
+const getDateStringPlusXHours = (d: string) => {
+	const randomDuration = [6, 8, 10][random(0, 2)];
+	return dayjs(d).local().add(randomDuration, "hours").format(BUS_TIME_FORMAT);
 };
 
-const getChennaiRoutesForDate = (date: string): Map<LOCATION_ID, BusRoute[]> => {
-	const datePlus10Hours = getDateStringPlus10Hours(date);
-	return new Map([
-		[
-			LOCATION_ID.BANGALORE,
-			[
-				{
-					from: LOCATION_ID.CHENNAI,
-					to: LOCATION_ID.BANGALORE,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-		[
-			LOCATION_ID.HYDERABAD,
-			[
-				{
-					from: LOCATION_ID.CHENNAI,
-					to: LOCATION_ID.HYDERABAD,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-		[
-			LOCATION_ID.COIMBATORE,
-			[
-				{
-					from: LOCATION_ID.CHENNAI,
-					to: LOCATION_ID.COIMBATORE,
-					startTime: date,
-					endTime: datePlus10Hours,
-					travelDurationInHours: dayjs(datePlus10Hours).diff(dayjs(date), "hours"),
-					id: generateUniqueBusId(),
-				},
-			],
-		],
-	]);
+const getDateDiffInHours = (a: string, b: string) =>
+	Math.abs(Math.round(dayjs(a).diff(dayjs(b), "hours", true)));
+
+const generateUniqueBusId = () => uniqueId("bus_");
+
+const generateBusRoute = (from: LOCATION_ID, to: LOCATION_ID, date: string) => {
+	const currDate = dayjs(date).local().format(BUS_TIME_FORMAT);
+	const datePlusXHours = getDateStringPlusXHours(currDate);
+	return {
+		from,
+		to,
+		id: generateUniqueBusId(),
+		startTime: currDate,
+		endTime: datePlusXHours,
+		travelDurationInHours: getDateDiffInHours(date, datePlusXHours),
+	};
 };
 
 const ALL_ROUTES = new Map([
 	[
 		LOCATION_ID.MADURAI,
-		new Map( // Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
-			(function* () {
-				yield* getMaduraiRoutesForDate("2023/06/27 10:00:00 +5:30");
-				yield* getMaduraiRoutesForDate("2023/06/28 10:00:00 +5:30");
-			})()
-		),
+		new Map([
+			// Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
+			[
+				LOCATION_ID.CHENNAI,
+				[
+					generateBusRoute(LOCATION_ID.MADURAI, LOCATION_ID.CHENNAI, dayjs().local().format()),
+					generateBusRoute(
+						LOCATION_ID.MADURAI,
+						LOCATION_ID.CHENNAI,
+						dayjs().add(5, "hours").local().format()
+					),
+					generateBusRoute(
+						LOCATION_ID.MADURAI,
+						LOCATION_ID.CHENNAI,
+						dayjs().add(10, "hours").local().format()
+					),
+				],
+			],
+		]),
 	],
 	[
 		LOCATION_ID.CHENNAI,
-		new Map( // Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
-			(function* () {
-				yield* getChennaiRoutesForDate("2023/06/27 10:00:00 +5:30");
-				yield* getChennaiRoutesForDate("2023/06/28 10:00:00 +5:30");
-			})()
-		),
+		new Map([
+			[
+				LOCATION_ID.MADURAI,
+				[
+					generateBusRoute(LOCATION_ID.CHENNAI, LOCATION_ID.MADURAI, dayjs().local().format()),
+					generateBusRoute(
+						LOCATION_ID.CHENNAI,
+						LOCATION_ID.MADURAI,
+						dayjs().add(2, "hours").local().format()
+					),
+				],
+			],
+		]),
 	],
 ]);
