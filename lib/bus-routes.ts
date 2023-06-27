@@ -55,43 +55,30 @@ const generateBusRoute = (from: LOCATION_ID, to: LOCATION_ID, date: string) => {
 	};
 };
 
-const ALL_ROUTES = new Map([
-	[
+const MADURAI_TO_CHENNAI_ROUTES = [
+	generateBusRoute(LOCATION_ID.MADURAI, LOCATION_ID.CHENNAI, dayjs().local().format()),
+	generateBusRoute(
 		LOCATION_ID.MADURAI,
-		new Map([
-			// Immediately invoked generator function to merge the maps (https://stackoverflow.com/a/32001750)
-			[
-				LOCATION_ID.CHENNAI,
-				[
-					generateBusRoute(LOCATION_ID.MADURAI, LOCATION_ID.CHENNAI, dayjs().local().format()),
-					generateBusRoute(
-						LOCATION_ID.MADURAI,
-						LOCATION_ID.CHENNAI,
-						dayjs().add(5, "hours").local().format()
-					),
-					generateBusRoute(
-						LOCATION_ID.MADURAI,
-						LOCATION_ID.CHENNAI,
-						dayjs().add(10, "hours").local().format()
-					),
-				],
-			],
-		]),
-	],
-	[
 		LOCATION_ID.CHENNAI,
-		new Map([
-			[
-				LOCATION_ID.MADURAI,
-				[
-					generateBusRoute(LOCATION_ID.CHENNAI, LOCATION_ID.MADURAI, dayjs().local().format()),
-					generateBusRoute(
-						LOCATION_ID.CHENNAI,
-						LOCATION_ID.MADURAI,
-						dayjs().add(2, "hours").local().format()
-					),
-				],
-			],
-		]),
-	],
+		dayjs().add(5, "hours").local().format()
+	),
+	generateBusRoute(
+		LOCATION_ID.MADURAI,
+		LOCATION_ID.CHENNAI,
+		dayjs().add(10, "hours").local().format()
+	),
+];
+
+const CHENNAI_TO_MADURAI_ROUTES = [
+	generateBusRoute(LOCATION_ID.CHENNAI, LOCATION_ID.MADURAI, dayjs().local().format()),
+	generateBusRoute(
+		LOCATION_ID.CHENNAI,
+		LOCATION_ID.MADURAI,
+		dayjs().add(2, "hours").local().format()
+	),
+];
+
+const ALL_ROUTES = new Map([
+	[LOCATION_ID.MADURAI, new Map([[LOCATION_ID.CHENNAI, MADURAI_TO_CHENNAI_ROUTES]])],
+	[LOCATION_ID.CHENNAI, new Map([[LOCATION_ID.MADURAI, CHENNAI_TO_MADURAI_ROUTES]])],
 ]);
