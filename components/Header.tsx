@@ -1,26 +1,24 @@
-import Logo from "@/public/logo.svg"
-import Link from "next/link"
+import Logo from "@/public/logo.svg";
+import Link from "next/link";
+import { ReactNode } from "react";
 
-const VerticalDivider = () => {
-    return (
-        <div className="mx-8 text-gray-400"> | </div>
-    )
+interface Props {
+	children?: ReactNode;
 }
 
-const Header = () => {
-    return (
-      <div className="flex items-center px-8 py-3 sticky shadow drop-shadow-md shadow-neutral-200">
-        <title>BookBus</title>
-        <Logo className="mx-6 w-[80px]" />
-        <VerticalDivider />
-        <div className="flex w-full">
-          <div className="flex items-center w-full">
-            <Link href={"/"}>Bus Tickets</Link>
-          </div>
-          <div className="flex items-center col-auto">Profile</div>
-        </div>
-      </div>
-    );
-}
+const Header = ({ children }: Props) => {
+	return (
+		<div className="flex items-center px-8 py-3 sticky shadow drop-shadow-md shadow-neutral-200">
+			<Logo className="px-8 w-[140px] border-r border-r-slate-200" />
+			<div className="flex w-full px-6">
+				<div className="flex items-center w-full">
+					<Link href={"/"}>Bus Tickets</Link>
+				</div>
+				<div className="flex items-center col-auto">Profile</div>
+			</div>
+			{children}
+		</div>
+	);
+};
 
-export { Header }
+export { Header };
