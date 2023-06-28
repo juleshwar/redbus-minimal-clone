@@ -154,16 +154,23 @@ const getLocationSuggestions = (
 	loc: string,
 	allLocationIdToNameMap: Record<LOCATION_ID, LocationDetails["name"]>
 ): SuggestionItem[] => {
-	const allLocationSuggestions = Object.entries(allLocationIdToNameMap).map(([locId, locName]) => ({
-		id: locId,
-		name: locName,
-	}));
-	const filteredLocations = allLocationSuggestions.filter((locObj) =>
-		locObj.name.toLowerCase().includes(loc)
+	const allLocationSuggestions = Object.entries(allLocationIdToNameMap) as [
+		LOCATION_ID,
+		LocationDetails["name"]
+	][];
+	const filteredLocations = allLocationSuggestions.filter(([locId, locName]) =>
+		locName.toLowerCase().includes(loc.toLowerCase())
 	);
 
+	const locationSuggestionMapper = ([locId, locName]: [LOCATION_ID, LocationDetails["name"]]) => ({
+		id: locId,
+		name: locName,
+	});
+
 	// return all locations if array empty
-	return filteredLocations.length > 0 ? filteredLocations : allLocationSuggestions;
+	return filteredLocations.length > 0
+		? filteredLocations.map(locationSuggestionMapper)
+		: allLocationSuggestions.map(locationSuggestionMapper);
 };
 
 function getBusTicketsUrl(
