@@ -2,7 +2,7 @@ import Logo from "@/public/logo.svg";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import { LoginDialog } from "./LoginDialog";
-import { useCurrentUser } from "../util/customHooks";
+import { useCurrentUser } from "../util/custom-hooks/useCurrentUser";
 
 interface Props {
 	children?: ReactNode;

@@ -8,7 +8,7 @@ import {
 	InputAdornment,
 	TextField,
 } from "@mui/material";
-import { CurrentUser } from "../util/customHooks";
+import { CurrentUser } from "../util/custom-hooks/useCurrentUser";
 import { FormEvent, useState } from "react";
 
 interface LoginDialogProps {
