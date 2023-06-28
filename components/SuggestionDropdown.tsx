@@ -15,7 +15,7 @@ export const SuggestionDropdown = ({ items, onClickItem }: SuggestionProps) => {
 				const { id, name } = item;
 				return (
 					<li
-						className="cursor-default hover:bg-gray-200"
+						className="cursor-default px-4 py-1 hover:bg-gray-200"
 						key={id}
 						onClick={() => onClickItem(item)}
 						onMouseDown={(event) => event.preventDefault()}

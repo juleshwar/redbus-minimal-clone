@@ -68,7 +68,16 @@ const InputWithAutosuggestion = (props: Props) => {
 						<span className="absolute top-full left-0 text-xs text-red-600">{errorMessage}</span>
 					)}
 				</div>
-				<div className={classNames(["border border-blue-600", "absolute top-full", !showSuggestions && "hidden"])}>
+				<div
+					className={classNames([
+						"z-10",
+						"overflow-hidden",
+						"border border-blue-600 bg-white",
+						"w-64 rounded-md",
+						"absolute top-full",
+						!showSuggestions && "hidden",
+					])}
+				>
 					<SuggestionDropdown items={suggestions} onClickItem={onClickSuggestionHandler} />
 				</div>
 			</div>
