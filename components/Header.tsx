@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Header = ({ children }: Props) => {
-	const [showLoginDialog, setShowLoginDialog] = useState(true);
+	const [showLoginDialog, setShowLoginDialog] = useState(false);
 
 	return (
 		<div className="flex px-8 py-3 sticky shadow drop-shadow-md shadow-neutral-200">
