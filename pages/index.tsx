@@ -97,18 +97,20 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 
 	return (
 		<main className="flex min-h-screen flex-col">
-			<Header />
+			<Header>
+				<title>BookBus</title>
+			</Header>
 			<section className="flex flex-col">
 				<div
 					className="flex w-full items-center justify-center bg-cover bg-no-repeat h-96"
 					style={{ backgroundImage: "url('/home-bg-banner.svg')" }}
 				>
 					<form
-						className="flex bg-white text-xl rounded-3xl shadow-md gap-8 items-center h-24 w-fit"
+						className="flex bg-white text-xl rounded-3xl shadow-md h-24"
 						onSubmit={onFormSubmitHandler}
 						ref={travelFormRef}
 					>
-						<div className="pl-9">
+						<div className="px-4 flex items-center border-separate border-r">
 							<InputWithAutosuggestion
 								label="From"
 								value={sourceLocation}
@@ -119,8 +121,7 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 								errorMessage={sourceLocationErrorMessage}
 							/>
 						</div>
-						|
-						<div className="">
+						<div className="px-4 flex items-center border-separate border-r">
 							<InputWithAutosuggestion
 								label="To"
 								value={destinationLocation}
@@ -131,8 +132,7 @@ export default function Home({ allLocationIdToNameMap, allNameToLocationIdMap }:
 								errorMessage={destinationLocationErrorMessage}
 							/>
 						</div>
-						|
-						<div>
+						<div className="px-4 flex items-center">
 							<DatePicker
 								minDate={travelDate}
 								defaultValue={travelDate}
