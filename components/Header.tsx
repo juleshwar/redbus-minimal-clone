@@ -2,6 +2,7 @@ import Logo from "@/public/logo.svg";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import { LoginDialog } from "./LoginDialog";
+import { useCurrentUser } from "../util/customHooks";
 
 interface Props {
 	children?: ReactNode;
@@ -9,6 +10,7 @@ interface Props {
 
 const Header = ({ children }: Props) => {
 	const [showLoginDialog, setShowLoginDialog] = useState(false);
+	const [currentUser, setCurrentUser] = useCurrentUser();
 
 	return (
 		<div className="flex px-8 py-3 sticky shadow drop-shadow-md shadow-neutral-200">
@@ -21,12 +23,17 @@ const Header = ({ children }: Props) => {
 					className="flex items-center col-auto border rounded-md border-green-600 cursor-pointer px-8 py-4"
 					onClick={() => setShowLoginDialog(true)}
 				>
-					Login
+					{currentUser ? "Profile" : "Login"}
 				</div>
 			</div>
 			{children}
 			{showLoginDialog && (
-				<LoginDialog isOpen={showLoginDialog} onClose={() => setShowLoginDialog(false)} />
+				<LoginDialog
+					currentUser={currentUser}
+					setCurrentUser={setCurrentUser}
+					isOpen={showLoginDialog}
+					onClose={() => setShowLoginDialog(false)}
+				/>
 			)}
 		</div>
 	);
