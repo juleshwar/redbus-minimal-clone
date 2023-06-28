@@ -8,27 +8,26 @@ enum BUS_SEAT_TYPE {
 
 const generateBusSeatId = () => uniqueId("bus_seat_");
 
-interface BusSeat {
+export interface BusSeat {
 	id: string;
 	type: BUS_SEAT_TYPE;
+	booked?: boolean;
 }
 
-type BusSeatArrangement = Array<Array<BusSeat>>;
+export type BusSeatArrangement = Array<Array<BusSeat>>;
 
-export default async function busSeats(busId: BusRoute["id"]): Promise<BusSeatArrangement> {
-	switch (busId) {
-		case "bus_1":
-			return getSeaterPlusSleeperBusSeatArrangement();
-
-		case "bus_2":
-		case "bus_3":
-		case "bus_4":
-			return getAllSeaterBusSeatArrangement();
-		default:
-			return getAllSeaterBusSeatArrangement();
-			break;
+export default async function getAllBusSeats(busId: BusRoute["id"]): Promise<BusSeatArrangement> {
+	const busSeats = BUS_SEATS?.[busId];
+	if (busSeats === undefined) {
+		initialiseBusSeatsForBus(busId);
+		return BUS_SEATS[busId];
 	}
+	return busSeats;
 }
+
+const initialiseBusSeatsForBus = (busId: BusRoute["id"]) => {
+	BUS_SEATS[busId] = getAllSeaterBusSeatArrangement();
+};
 
 const getAllSeaterBusSeatArrangement = () => {
 	return [
@@ -60,4 +59,11 @@ const getSeaterPlusSleeperBusSeatArrangement = () => {
 			{ type: BUS_SEAT_TYPE.SLEEPER, id: generateBusSeatId() },
 		],
 	];
+};
+
+const BUS_SEATS: Record<BusRoute["id"], BusSeatArrangement> = {
+	bus_1: getSeaterPlusSleeperBusSeatArrangement(),
+	bus_2: getAllSeaterBusSeatArrangement(),
+	bus_3: getAllSeaterBusSeatArrangement(),
+	bus_4: getAllSeaterBusSeatArrangement(),
 };
